@@ -3,6 +3,7 @@ package handler
 import (
 	"log"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"ksni.com/crud/database"
 	"ksni.com/crud/model/entity"
@@ -32,6 +33,13 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 
 	if err := ctx.BodyParser(user); err != nil {
 		return err
+	}
+
+	validate := validator.New()
+	errValidate := validate.Struct(user)
+
+	if errValidate != nil {
+		return errValidate
 	}
 
 	newUser := entity.User {
