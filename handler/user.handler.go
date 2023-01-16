@@ -87,7 +87,7 @@ func UserHandlerGetById(ctx *fiber.Ctx) error {
 	})
 }
 
-func UserHandlerUpdate(ctx *fiber.Ctx) error {
+func UserHandlerUpdateById(ctx *fiber.Ctx) error {
 	userRequest := new(request.UserUpdateRequest)
 
 	if err := ctx.BodyParser(userRequest); err != nil {
@@ -124,5 +124,28 @@ func UserHandlerUpdate(ctx *fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{
 		"message": "success",
 		"data": user,
+	})
+}
+
+func UserHandlerDeleteById(ctx *fiber.Ctx) error {
+	userId := ctx.Params("id")
+	var user entity.User
+
+	err := database.DB.Debug().First(&user, "id=?", userId).Error
+	if err != nil {
+		return ctx.Status(404).JSON(fiber.Map{
+			"message": "user not found",
+		})
+	}
+
+	errDelete := database.DB.Debug().Delete(&user).Error
+	if errDelete != nil {
+		return ctx.Status(500).JSON(fiber.Map{
+			"message": "Internal server error",
+		})
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "user was deleted",
 	})
 }
