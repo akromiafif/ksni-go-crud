@@ -88,3 +88,43 @@ func UserHandlerGetById(ctx *fiber.Ctx) error {
 		"data": userResponse,
 	})
 }
+
+func UserHandlerUpdate(ctx *fiber.Ctx) error {
+	userRequest := new(request.UserUpdateRequest)
+
+	if err := ctx.BodyParser(userRequest); err != nil {
+		return ctx.Status(400).JSON(fiber.Map{
+			"message": "bad request",
+		})
+	}
+
+	var user entity.User
+	userId := ctx.Params("id")
+
+	err := database.DB.First(&user, "id = ?", userId).Error
+
+	if err != nil {
+		return ctx.Status(404).JSON(fiber.Map{
+			"message": "user not found",
+		})
+	}
+
+	if userRequest.Name != "" {
+		user.Name = userRequest.Name
+	}
+
+	user.Address = userRequest.Address
+	user.Phone = userRequest.Phone
+	errUpdate := database.DB.Save(&user)
+
+	if errUpdate != nil {
+		return ctx.Status(500).JSON(fiber.Map{
+			"message": "Internal server error",
+		})
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "success",
+		"data": user,
+	})
+}
