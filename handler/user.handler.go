@@ -8,6 +8,7 @@ import (
 	"ksni.com/crud/database"
 	"ksni.com/crud/model/entity"
 	"ksni.com/crud/model/request"
+	"ksni.com/crud/model/response"
 )
 
 func UserHandlerGetAll(ctx *fiber.Ctx) error {
@@ -72,8 +73,18 @@ func UserHandlerGetById(ctx *fiber.Ctx) error {
 		})
 	}
 
+	userResponse := response.UserResponse{
+		ID: user.ID,
+		Name: user.Name,
+		Email: user.Email,
+		Address: user.Address,
+		Phone: user.Phone,
+		Created_At: user.Created_At,
+		Updated_At: user.Updated_At,
+	}
+
 	return ctx.JSON(fiber.Map{
 		"message": "success",
-		"data": user,
+		"data": userResponse,
 	})
 }
