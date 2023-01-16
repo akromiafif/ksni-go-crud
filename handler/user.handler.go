@@ -79,8 +79,6 @@ func UserHandlerGetById(ctx *fiber.Ctx) error {
 		Email: user.Email,
 		Address: user.Address,
 		Phone: user.Phone,
-		Created_At: user.Created_At,
-		Updated_At: user.Updated_At,
 	}
 
 	return ctx.JSON(fiber.Map{
@@ -115,11 +113,11 @@ func UserHandlerUpdate(ctx *fiber.Ctx) error {
 
 	user.Address = userRequest.Address
 	user.Phone = userRequest.Phone
-	errUpdate := database.DB.Save(&user)
+	errUpdate := database.DB.Save(&user).Error
 
 	if errUpdate != nil {
 		return ctx.Status(500).JSON(fiber.Map{
-			"message": "Internal server error",
+			"message": errUpdate,
 		})
 	}
 
