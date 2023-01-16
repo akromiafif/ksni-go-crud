@@ -10,12 +10,6 @@ import (
 	"ksni.com/crud/model/request"
 )
 
-func UserHandler(ctx *fiber.Ctx) error {
-	return ctx.JSON(fiber.Map{
-		"data": "user",
-	})
-}
-
 func UserHandlerGetAll(ctx *fiber.Ctx) error {
 	var users []entity.User
 
@@ -39,7 +33,10 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 	errValidate := validate.Struct(user)
 
 	if errValidate != nil {
-		return errValidate
+		return ctx.Status(400).JSON(fiber.Map{
+			"message": "failed",
+			"error": errValidate.Error(),
+		})
 	}
 
 	newUser := entity.User {
@@ -60,5 +57,23 @@ func UserHandlerCreate(ctx *fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{
 		"message": "success",
 		"data": newUser,
+	})
+}
+
+func UserHandlerGetById(ctx *fiber.Ctx) error {
+	userId := ctx.Params("id")
+
+	var user entity.User
+	err := database.DB.First(&user, "id = ?", userId).Error
+
+	if err != nil {
+		return ctx.Status(404).JSON(fiber.Map{
+			"message": "user not found",
+		})
+	}
+
+	return ctx.JSON(fiber.Map{
+		"message": "success",
+		"data": user,
 	})
 }
