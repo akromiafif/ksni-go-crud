@@ -11,7 +11,8 @@ func RouteInit(r *fiber.App) {
 			"hello": "Oke",
 		})
 	})
-	r.Get("/user", handler.UserHandler)
+	r.Get("/user", handler.UserHandlerGetAll)
+	r.Post("/user", handler.UserHandlerCreate)
 
 	r.Listen(":8080")
 }
